@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="gasstation@localhost">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.0">
+    <root id="1"/>
+    <schema id="2" parent="1" name="gasstation">
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <schema id="3" parent="1" name="information_schema"/>
+    <schema id="4" parent="1" name="mysql"/>
+    <schema id="5" parent="1" name="performance_schema"/>
+    <table id="6" parent="2" name="car"/>
+    <table id="7" parent="2" name="fuel"/>
+    <column id="8" parent="6" name="car_id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="9" parent="6" name="car_name">
+      <Position>2</Position>
+      <DataType>char(30)|0</DataType>
+    </column>
+    <column id="10" parent="6" name="car_tank_volume">
+      <Position>3</Position>
+      <DataType>double|0</DataType>
+    </column>
+    <column id="11" parent="6" name="fuel_id">
+      <Position>4</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="12" parent="6" name="fuel_id">
+      <ColNames>fuel_id</ColNames>
+    </index>
+    <key id="13" parent="6" name="PRIMARY">
+      <ColNames>car_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="14" parent="6" name="car_ibfk_1">
+      <ColNames>fuel_id</ColNames>
+      <RefSchemaName>gasstation</RefSchemaName>
+      <RefTableName>fuel</RefTableName>
+      <RefColNames>fuel_id</RefColNames>
+    </foreign-key>
+    <column id="15" parent="7" name="fuel_id">
+      <Position>1</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="16" parent="7" name="fuel_name">
+      <Position>2</Position>
+      <DataType>char(7)|0</DataType>
+    </column>
+    <column id="17" parent="7" name="fuel_cost">
+      <Position>3</Position>
+      <DataType>double|0</DataType>
+    </column>
+    <index id="18" parent="7" name="fuel_name">
+      <ColNames>fuel_name</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="19" parent="7" name="PRIMARY">
+      <ColNames>fuel_id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <key id="20" parent="7" name="fuel_name">
+      <ColNames>fuel_name</ColNames>
+      <UnderlyingIndexName>fuel_name</UnderlyingIndexName>
+    </key>
+  </database-model>
+</dataSource>

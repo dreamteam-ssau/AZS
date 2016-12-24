@@ -1,0 +1,11 @@
+#myTable .table-cell{
+    -fx-alignment: CENTER-LEFT;
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: lightgreen;
+}
+.list-cell:disabled{
+    -fx-background-color: lightcoral;
+}
+
