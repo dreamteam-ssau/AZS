@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="mainWindow" focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-border-color: black;" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.ssau.gasstation.GUI.controllers.MainWindowController">
+   <top>
+      <MenuBar fx:id="menuBar" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="Файл">
+            <items>
+              <MenuItem fx:id="create" mnemonicParsing="false" text="Создать" />
+                <MenuItem fx:id="load" mnemonicParsing="false" text="Загрузить" />
+                <MenuItem fx:id="save" mnemonicParsing="false" text="Сохранить" />
+                <MenuItem fx:id="clear" mnemonicParsing="false" text="Очистить" />
+                <MenuItem fx:id="close" mnemonicParsing="false" text="Выход" />
+            </items>
+          </Menu>
+          <Menu fx:id="dbButton" mnemonicParsing="false">
+          </Menu>
+            <Menu fx:id="runButton" mnemonicParsing="false">
+            </Menu>
+          <Menu mnemonicParsing="false" text="Справка">
+            <items>
+              <MenuItem fx:id="help" mnemonicParsing="false" text="Помощь" />
+                <MenuItem fx:id="authors" text="Об Авторах" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <left>
+      <VBox alignment="TOP_CENTER" style="-fx-border-color: black;" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="Элементы топологии" />
+            <ListView fx:id="itemList" focusTraversable="false" pickOnBounds="false" prefHeight="1000" prefWidth="300" />
+         </children>
+      </VBox>
+   </left>
+   <center>
+      <Pane fx:id="constructor">
+      </Pane>
+   </center>
+   <right>
+      <VBox alignment="TOP_CENTER" style="-fx-border-color: black;">
+         <children>
+             <Label alignment="TOP_CENTER" text="Настройки" textAlignment="CENTER" />
+             <GridPane fx:id="settings" alignment="TOP_LEFT" prefHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">
+               <VBox.margin>
+                  <Insets left="5.0" top="25.0" />
+               </VBox.margin></GridPane>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>
