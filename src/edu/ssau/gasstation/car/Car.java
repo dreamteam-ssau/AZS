@@ -7,14 +7,16 @@ public class Car {
     private double time;
     private int fuelID;
     private int picID;
-    private double totalVolumOfTank;
+    private double totalVolumeOfTank;
     private double currentVolumeOfTank;
+    private String name;
 
-    public Car(double time, int fuelID, int picID, double totalVolumOfTank, double currentVolumeOfTank) {
+    public Car(String name, double time, int fuelID, int picID, double totalVolumOfTank, double currentVolumeOfTank) {
+        this.name = name;
         this.time = time;
         this.fuelID = fuelID;
         this.picID = picID;
-        this.totalVolumOfTank = totalVolumOfTank;
+        this.totalVolumeOfTank = totalVolumOfTank;
         this.currentVolumeOfTank = currentVolumeOfTank;
     }
 
@@ -43,11 +45,11 @@ public class Car {
     }
 
     public double getTotalVolumOfTank() {
-        return totalVolumOfTank;
+        return totalVolumeOfTank;
     }
 
     public void setTotalVolumOfTank(double totalVolumOfTank) {
-        this.totalVolumOfTank = totalVolumOfTank;
+        this.totalVolumeOfTank = totalVolumOfTank;
     }
 
     public double getCurrentVolumeOfTank() {
@@ -59,7 +61,7 @@ public class Car {
     }
 
     public void fill(){
-        currentVolumeOfTank = totalVolumOfTank;
+        currentVolumeOfTank = totalVolumeOfTank;
     }
 
     public static Car createCar(){

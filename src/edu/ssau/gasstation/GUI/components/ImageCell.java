@@ -21,6 +21,8 @@ public class ImageCell {
     public ImageCell(int rowNum, int columnNum, double width, double height){
         c = new Canvas(width, height);
         gc = c.getGraphicsContext2D();
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, c.getWidth(), c.getHeight());
         isSet = false;
         i = rowNum;
         j = columnNum;
@@ -66,6 +68,8 @@ public class ImageCell {
         gc.clearRect(0, 0, c.getHeight(), c.getHeight());
         isSet = false;
         this.pic = null;
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, c.getWidth(), c.getHeight());
     }
 
     public void renderCellWithBackground(Color background){

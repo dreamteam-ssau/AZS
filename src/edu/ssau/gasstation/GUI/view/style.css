@@ -8,4 +8,19 @@
 .list-cell:disabled{
     -fx-background-color: lightcoral;
 }
+.myGrid{
+    -fx-border-color: black;
+    -fx-padding: 10px; -fx-vgap: 5px;
+    -fx-hgap: 5px
+}
+
+.rightBorder{
+    -fx-border-width: 0 3 0 0;
+    -fx-border-color: silver;
+}
+
+.leftBorder{
+    -fx-border-width: 0 0 0 3;
+    -fx-border-color: silver;
+}
 

@@ -5,6 +5,8 @@ import edu.ssau.gasstation.GUI.components.ImageCell;
 import edu.ssau.gasstation.GUI.model.FuelRecord;
 import edu.ssau.gasstation.XMLHelper.XMLParser;
 import edu.ssau.gasstation.XMLHelper.XMLWriter;
+import edu.ssau.gasstation.car.*;
+import edu.ssau.gasstation.modelling.*;
 import edu.ssau.gasstation.topology.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,6 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -79,6 +82,8 @@ public class MainWindowController {
     private Parent root = null;
     private ArrayList<ImageCell> icList = new ArrayList<>();
     private ArrayList<ListCell<String>> refItemList = new ArrayList<>();
+    private ArrayList<Integer> dispenserFuel = new ArrayList<>();
+    private ArrayList<Integer> tankFuel = new ArrayList<>();
 
     @FXML
     private void initialize() {
@@ -184,7 +189,7 @@ public class MainWindowController {
             HBox line1 = new HBox();
             VBox sep1 = new VBox();
             TextField width = new TextField("3");
-            chekTopologySize(width, "\\d{0,2}");
+            chekTopologySize(width, "\\d{0,2}", 10);
             width.setStyle("-fx-pref-height: 32px");
             line1.getChildren().addAll(width);
             Button widthUp = new Button();
@@ -212,7 +217,7 @@ public class MainWindowController {
             HBox line2 = new HBox();
             VBox sep2 = new VBox();
             TextField height = new TextField("3");
-            chekTopologySize(height, "\\d{0,2}");
+            chekTopologySize(height, "\\d{0,2}", 10);
             height.setStyle("-fx-pref-height: 32px");
             line2.getChildren().addAll(height);
             Button heightUp = new Button();
@@ -281,6 +286,7 @@ public class MainWindowController {
 
         load.setOnAction(event -> {
             FileChooser fc = new FileChooser();
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Топология", "*.xml"));
             fc.setTitle("Выберите файл");
             File tFile = fc.showOpenDialog(null);
             if(tFile != null) {
@@ -338,7 +344,326 @@ public class MainWindowController {
 
         Label runLabel = new Label("Запустить");
         runLabel.setOnMouseClicked(event -> {
-            DBWindowController.showAlert("В разработке", "Не возможно открыть");
+            int exI = -1;
+            int exJ = -1;
+            dispenserFuel.clear();
+            tankFuel.clear();
+            try {
+                for (int i = 0; i < topology.getHeight(); i++) {
+                    for (int j = 0; j < topology.getWidth(); j++) {
+                        if(topology.getTopologyItem(i, j) instanceof Tank){
+                            int id;
+                            if ((id = ((Tank) topology.getTopologyItem(i, j)).getFuelID()) != -1) {
+                                tankFuel.add(id);
+                            } else {
+                                exI = i;
+                                exJ = j;
+                                throw new IllegalArgumentException("Необходимо указать тип топлива резервуара");
+                            }
+                        }
+                        else if (topology.getTopologyItem(i, j) instanceof Dispenser) {
+                            int id;
+                            if ((id = ((Dispenser) topology.getTopologyItem(i, j)).getFuelID()) != -1) {
+                                if(tankFuel.contains(id)) {
+                                    dispenserFuel.add(id);
+                                }
+                                else{
+                                    exI = i;
+                                    exJ = j;
+                                    throw new IllegalArgumentException("На топологии не существует резервуара с данным типом топлива");
+                                }
+                            } else {
+                                exI = i;
+                                exJ = j;
+                                throw new IllegalArgumentException("Необходимо указать тип топлива ТРК");
+                            }
+                        }
+                    }
+                }
+
+                if (office) {
+                    if (in) {
+                        if (out) {
+                            if (tankCount > 0) {
+                                if (dispenserCount > 0) {
+                                    Stage preRunStage = new Stage();
+                                    Pane determPane = new Pane();
+                                    GridPane randomPane = new GridPane();
+                                    determPane.setStyle("-fx-border-color: black; -fx-padding: 10px");
+                                    determPane.setPrefSize(690, 120);
+                                    randomPane.setStyle("-fx-border-color: black; -fx-padding: 10px");
+                                    randomPane.setPrefSize(690, 120);
+                                    GridPane linTime = new GridPane();
+                                    linTime.add(new Label("Период генерации автомобилей"), 0, 0);
+                                    TextField time = new TextField();
+                                    checkTextField(time, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    linTime.add(time, 1, 0);
+                                    linTime.setPadding(new Insets(10));
+                                    linTime.setHgap(10);
+                                    determPane.getChildren().add(linTime);
+                                    GridPane zr = new GridPane();
+                                    GridPane normal = new GridPane();
+                                    normal.getStylesheets().add("edu/ssau/gasstation/GUI/view/style.css");
+                                    normal.getStyleClass().add("myGrid");
+                                    Label lDisp = new Label("σ\u00B2");
+                                    TextField tDisp = new TextField();
+                                    checkTextField(tDisp, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    normal.add(lDisp, 0, 0);
+                                    normal.add(tDisp, 1, 0);
+                                    normal.add(new Label("μ"), 0, 1);
+                                    TextField mo = new TextField();
+                                    checkTextField(mo, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    normal.add(mo, 1, 1);
+                                    GridPane exp = new GridPane();
+                                    exp.getStylesheets().add("edu/ssau/gasstation/GUI/view/style.css");
+                                    exp.getStyleClass().add("myGrid");
+                                    exp.add(new Label("λ"), 0, 0);
+                                    TextField intens = new TextField();
+                                    checkTextField(intens, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    exp.add(intens, 1, 0);
+                                    exp.setDisable(true);
+                                    GridPane ravn = new GridPane();
+                                    ravn.getStylesheets().add("edu/ssau/gasstation/GUI/view/style.css");
+                                    ravn.getStyleClass().add("myGrid");
+                                    ravn.add(new Label("a"), 0, 0);
+                                    ravn.add(new Label("b"), 0, 1);
+                                    TextField a = new TextField();
+                                    TextField b = new TextField();
+                                    checkTextField(a, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    checkTextField(b, "(\\d{1,2})(\\.\\d{0,3})?", -1);
+                                    ravn.setDisable(true);
+                                    ravn.add(a, 1, 0);
+                                    ravn.add(b, 1, 1);
+                                    zr.add(ravn, 2, 1);
+                                    zr.add(exp, 1, 1);
+                                    zr.add(normal, 0, 1);
+                                    ToggleGroup tZR = new ToggleGroup();
+                                    RadioButton rNormal = new RadioButton("Нормальный ЗР");
+                                    rNormal.setOnAction(event1 -> {
+                                        normal.setDisable(false);
+                                        exp.setDisable(true);
+                                        ravn.setDisable(true);
+                                    });
+                                    rNormal.setToggleGroup(tZR);
+                                    rNormal.setSelected(true);
+                                    RadioButton rExp = new RadioButton("Экспоненциальный ЗР");
+                                    rExp.setOnAction(event1 -> {
+                                        exp.setDisable(false);
+                                        normal.setDisable(true);
+                                        ravn.setDisable(true);
+                                    });
+                                    rExp.setToggleGroup(tZR);
+                                    RadioButton rRavn = new RadioButton("Равномерный ЗР");
+                                    rRavn.setOnAction(event1 -> {
+                                        ravn.setDisable(false);
+                                        exp.setDisable(true);
+                                        normal.setDisable(true);
+                                    });
+                                    rRavn.setToggleGroup(tZR);
+                                    zr.add(rNormal, 0, 0);
+                                    zr.add(rExp, 1, 0);
+                                    zr.add(rRavn, 2, 0);
+                                    zr.setHgap(20);
+                                    zr.setVgap(3);
+                                    randomPane.add(zr, 0, 0);
+                                    VBox mainBox = new VBox();
+                                    mainBox.setPadding(new Insets(10));
+                                    HBox hb = new HBox();
+                                    Label type = new Label("Тип потока: ");
+                                    type.setPadding(new Insets(5, 0, 5, 5));
+                                    hb.getChildren().add(type);
+                                    ToggleGroup group = new ToggleGroup();
+                                    RadioButton determ = new RadioButton("Детерменированный");
+                                    determ.setOnAction(event1 -> mainBox.getChildren().set(1, determPane));
+                                    RadioButton random = new RadioButton("Случайный");
+                                    random.setOnAction(event1 -> mainBox.getChildren().set(1, randomPane));
+                                    determ.setToggleGroup(group);
+                                    random.setToggleGroup(group);
+                                    determ.setPadding(new Insets(5, 0, 5, 10));
+                                    random.setPadding(new Insets(5, 0, 5, 10));
+                                    determ.setSelected(true);
+                                    hb.getChildren().addAll(determ, random);
+                                    GridPane fuelAndOffice = new GridPane();
+                                    fuelAndOffice.add(new Label("Минимальный уровень топлива в резервуаре"), 0, 0);
+                                    fuelAndOffice.add(new Label("Лимит кассы"), 0, 1);
+                                    fuelAndOffice.setHgap(10);
+                                    fuelAndOffice.setVgap(10);
+                                    HBox fuelLine = new HBox();
+                                    VBox fuelButtons = new VBox();
+                                    TextField minFuel = new TextField("30");
+                                    chekTopologySize(minFuel, "\\d{0,3}", 95);
+                                    minFuel.setStyle("-fx-pref-height: 32px");
+                                    fuelLine.getChildren().addAll(minFuel);
+                                    Button minFuelUp = new Button();
+                                    minFuelUp.setPadding(new Insets(0, 0, 0, 0));
+                                    minFuelUp.setText("▲");
+                                    minFuelUp.setOnAction(event1 -> {
+                                        int row;
+                                        if ((row = Integer.valueOf(minFuel.getText())) < 95) {
+                                            minFuel.setText(String.valueOf(row + 5));
+                                        }
+                                    });
+                                    Button minFuelDown = new Button();
+                                    minFuelDown.setPadding(new Insets(0, 0, 0, 0));
+                                    minFuelDown.setText("▼");
+                                    minFuelDown.setOnAction(event1 -> {
+                                        int row;
+                                        if ((row = Integer.valueOf(minFuel.getText())) > 30) {
+                                            minFuel.setText(String.valueOf(row - 5));
+                                        }
+                                    });
+                                    fuelButtons.getChildren().addAll(minFuelUp, minFuelDown);
+                                    fuelLine.getChildren().add(fuelButtons);
+                                    fuelAndOffice.add(fuelLine, 1, 0);
+                                    fuelAndOffice.add(new Label("%"), 2, 0);
+                                    fuelAndOffice.setPadding(new Insets(5));
+                                    TextField money = new TextField("700 тыс.руб");
+                                    money.setDisable(true);
+                                    fuelAndOffice.add(money, 1, 1);
+                                    Button ok = new Button("Ok");
+                                    ok.setOnAction(event1 -> {
+                                        Flow flow = null;
+                                        if (determ.isSelected()) {
+                                            if (!time.getText().equals("")) {
+                                                flow = new DeterministicFlow(Double.valueOf(time.getText()));
+                                            } else
+                                                DBWindowController.showAlert("Необходимо указать период генерации автомобилей", "Необходимо заполнить все поля");
+                                        } else {
+                                            if (rNormal.isSelected()) {
+                                                if (!tDisp.getText().equals("")) {
+                                                    if (!mo.getText().equals("")) {
+                                                        flow = new RandomFlow(new NormalDistribution(Double.valueOf(mo.getText()), Double.valueOf(tDisp.getText())));
+                                                    } else
+                                                        DBWindowController.showAlert("Необходимо указать математическое ожидание", "Необходимо заполнить все поля");
+                                                } else {
+                                                    if (!mo.getText().equals("")) {
+                                                        DBWindowController.showAlert("Необходимо указать дисперсию", "Необходимо заполнить все поля");
+                                                    } else
+                                                        DBWindowController.showAlert("Необходимо указать дисперсию и математическое ожидание", "Необходимо заполнить все поля");
+                                                }
+                                            } else if (rExp.isSelected()) {
+                                                if (!intens.getText().equals("")) {
+                                                    double rate = Double.valueOf(intens.getText());
+                                                    if (rate < 1 && rate > 0) {
+                                                        if (rate > 0.5) {
+                                                            rate -= 0.3;
+                                                        }
+                                                        flow = new RandomFlow(new ExponentialDistribution(rate));
+                                                    } else {
+                                                        DBWindowController.showAlert("Интенсивность должна быть в промежутке от 0 до 1", "Некорректное значение интенсивности");
+                                                    }
+                                                } else
+                                                    DBWindowController.showAlert("Необходимо указать интенсивность", "Необходимо заполнить все поля");
+                                            } else {
+                                                if (!a.getText().equals("")) {
+                                                    if (!b.getText().equals("")) {
+                                                        double left, right;
+                                                        if ((left = Double.valueOf(a.getText())) < (right = Double.valueOf(b.getText()))) {
+                                                            flow = new RandomFlow(new UniformDistribution(left, right));
+                                                        } else
+                                                            DBWindowController.showAlert("Левая граница должна быть меньше правой", "Некорректные данные");
+                                                    } else {
+                                                        DBWindowController.showAlert("Необходмсо указать правую границу", "Необходимо заполнить все поля");
+                                                    }
+                                                } else {
+                                                    if (!b.getText().equals("")) {
+                                                        DBWindowController.showAlert("Необходимо указать левую границу", "Необходимо заполнить все поля");
+                                                    } else
+                                                        DBWindowController.showAlert("Необходимо указать правую и левую границы", "Необходимо заполнить все поля");
+                                                }
+
+
+                                            }
+
+                                        }
+                                        CarPool cp = new CarPool(flow);
+                                        try {
+                                            ArrayList<edu.ssau.gasstation.car.Car> pool = cp.getCarPool(10);
+                                            System.out.println("POOL");
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();
+                                        }
+                                        //todo открывать окно моделирования
+                                        System.out.println("FLOW");
+                                    });
+                                    Button cancel = new Button("Отмена");
+                                    cancel.setOnAction(event1 -> preRunStage.close());
+                                    GridPane buttons = new GridPane();
+                                    buttons.setHgap(5);
+                                    buttons.add(ok, 1, 0);
+                                    buttons.add(cancel, 0, 0);
+                                    buttons.setAlignment(Pos.BOTTOM_RIGHT);
+                                    mainBox.getChildren().addAll(hb, determPane, fuelAndOffice, buttons);
+
+                                    preRunStage.setScene(new Scene(mainBox));
+                                    preRunStage.show();
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить хотя бы одну ТРК", "Невозможно запустить");
+                            } else
+                                DBWindowController.showAlert("Необходимо разместить хотя бы один резервуар", "Невозможно запустить");
+                        } else DBWindowController.showAlert("Необходимо разместить выезд", "Невозможно запустить");
+                    } else DBWindowController.showAlert("Необходимо разместить въезд", "Невозможно запустить");
+                } else {
+                    if (in) {
+                        if (out) {
+                            if (tankCount > 0) {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить кассу", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить кассу и хотя бы одну ТРК", "Невозможно запустить");
+                            } else {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить кассу и хотя бы один резервуар", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить кассу, хотя бы одну ТРК и хотя бы один резервуар", "Невозможно запустить");
+                            }
+                        } else {
+                            if (tankCount > 0) {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить выезд и кассу", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить выезд, кассу и хотя бы одну ТРК", "Невозможно запустить");
+                            } else {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить выезд, кассу и хотя бы один резервуар", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить выезд, кассу, хотя бы один резервуар и хотя бы одну ТРК", "Невозможно запустить");
+                            }
+                        }
+                    } else {
+                        if (out) {
+                            if (tankCount > 0) {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить въезд и кассу", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить въезд и хотя бы одну ТРК", "Невозможно запустить");
+                            } else {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить выезд, кассу и хотя бы один резервуар", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить выезд, кассу, хотя бы одни резервуа и хотя бы одну ТРК", "Невозможно запустить");
+                            }
+                        } else {
+                            if (tankCount > 0) {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить въезд, выезд и кассу", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить въезд, выезд, кассу и хотя бы одну ТРК", "Невозможно запустить");
+                            } else {
+                                if (dispenserCount > 0) {
+                                    DBWindowController.showAlert("Необходимо разместить выезд, выезд, кассу и хотя бы один резервуар", "Невозможно запустить");
+                                } else
+                                    DBWindowController.showAlert("Необходимо разместить выезд, выезд, кассу, хотя бы одни резервуа и хотя бы одну ТРК", "Невозможно запустить");
+                            }
+                        }
+                    }
+                }
+
+                //DBWindowController.showAlert("В разработке", "Не возможно открыть");
+            } catch (IllegalArgumentException e) {
+                showSettings(icList.get(exI * topology.getWidth() + exJ));
+                DBWindowController.showAlert(e.getMessage(), "Невозможно запустить моделирование");
+            }
         });
         runButton.setGraphic(runLabel);
 
@@ -625,6 +950,7 @@ public class MainWindowController {
                         if(!in) {
                             pic = "in-small.png";
                             in = true;
+                            refItemList.get(1).setDisable(true);
                         }
                         else throw new IOException("Недопустимая конфигурация топологии");
                     }
@@ -632,21 +958,31 @@ public class MainWindowController {
                         if(!out) {
                             pic = "out-small.png";
                             out = true;
+                            refItemList.get(2).setDisable(true);
                         }
                         else throw new IOException("Недопустимая конфигурация топологии");
                     }
                     else if(item instanceof Dispenser){
                         pic = "dispenser-small.png";
+                        dispenserCount++;
+                        if(dispenserCount > 4){
+                            refItemList.get(3).setDisable(true);
+                        }
                     }
                     else if(item instanceof Tank){
                         pic = "tank-small.png";
+                        tankCount++;
+                        if(tankCount > 4){
+                            refItemList.get(4).setDisable(true);
+                        }
                     }
                     else if(item instanceof Office){
                         if(!office) {
                             pic = "office-small.png";
                             office = true;
+                            refItemList.get(5).setDisable(true);
                         }
-                        else throw new IOException("Недопустимая конфигурация топологии");//todo написать свой эксепшен
+                        else throw new IOException("Недопустимая конфигурация топологии");
                     }
                     icList.get(i*topology.getHeight() + j).setPicture(new Image(getClass().getResourceAsStream("images/" + pic)));
                 }
@@ -670,7 +1006,7 @@ public class MainWindowController {
         }
     }
 
-    private void chekTopologySize(TextField field, String mutcher){
+    private void chekTopologySize(TextField field, String mutcher, int top){
         field.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -680,7 +1016,7 @@ public class MainWindowController {
                     } else {
                         try {
                             int check = Integer.valueOf(newValue);
-                            if (check > 10) {
+                            if (check > top) {
                                 field.setText(oldValue);
                             } else {
                                 field.setText(String.valueOf(check));
@@ -692,6 +1028,29 @@ public class MainWindowController {
                 }
             }
         });
+    }
 
+    private void checkTextField(TextField field, String mutcher, int min){
+        field.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!newValue.isEmpty()) {
+                    if (!newValue.matches(mutcher)) {
+                        field.setText(oldValue);
+                    } else {
+                        try {
+                            double check = Double.valueOf(newValue);
+                            if (check < min) {
+                                field.setText(oldValue);
+                            } else {
+                                field.setText(newValue);
+                            }
+                        } catch (NumberFormatException e) {
+                            field.setText(oldValue);
+                        }
+                    }
+                }
+            }
+        });
     }
 }

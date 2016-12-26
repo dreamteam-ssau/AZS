@@ -38,7 +38,7 @@
       </MenuBar>
    </top>
    <left>
-      <VBox alignment="TOP_CENTER" style="-fx-border-color: black;" BorderPane.alignment="CENTER">
+      <VBox alignment="TOP_CENTER" stylesheets="@style.css" styleClass="rightBorder" BorderPane.alignment="CENTER">
          <children>
             <Label text="Элементы топологии" />
             <ListView fx:id="itemList" focusTraversable="false" pickOnBounds="false" prefHeight="1000" prefWidth="300" />
@@ -50,7 +50,7 @@
       </Pane>
    </center>
    <right>
-      <VBox alignment="TOP_CENTER" style="-fx-border-color: black;">
+      <VBox alignment="TOP_CENTER" stylesheets="@style.css" styleClass="leftBorder" >
          <children>
              <Label alignment="TOP_CENTER" text="Настройки" textAlignment="CENTER" />
              <GridPane fx:id="settings" alignment="TOP_LEFT" prefHeight="200.0" prefWidth="300.0" BorderPane.alignment="CENTER">

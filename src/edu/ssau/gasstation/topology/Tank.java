@@ -8,6 +8,15 @@ public class Tank implements TopologyItem{
     private double totalVolume;
     private double curentVolume;
     private double criticalVolume;
+    private boolean locked;
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
 
     public Tank(){
         fuelID = -1;
@@ -17,6 +26,11 @@ public class Tank implements TopologyItem{
         this.fuelID = fuelID;
         this.totalVolume = 20.0;
         this.curentVolume = 20.0;
+    }
+
+    public String toString(){
+        return "Общий объем резервуара: "+ totalVolume +"\n"+"Количество топлива в резервуаре: "+ curentVolume+"\n"+"Тип топлива: "+fuelID+
+                "\n"+"Критический уровень: "+criticalVolume;
     }
 
     public int getFuelID() {
@@ -58,7 +72,9 @@ public class Tank implements TopologyItem{
         }
     }
 
+
     private void callRefueller(){
         //todo информировать о вызови дозаправщика (либо отрисовка приезда дозаправщика)
     }
+
 }
