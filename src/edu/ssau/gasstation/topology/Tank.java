@@ -20,12 +20,14 @@ public class Tank implements TopologyItem{
 
     public Tank(){
         fuelID = -1;
+        this.totalVolume = 200.0;
+        this.curentVolume = 200.0;
     }
 
     public Tank(int fuelID) {
         this.fuelID = fuelID;
-        this.totalVolume = 20.0;
-        this.curentVolume = 20.0;
+        this.totalVolume = 200.0;
+        this.curentVolume = 200.0;
     }
 
     public String toString(){

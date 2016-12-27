@@ -17,9 +17,9 @@ public class SelectImageUtil {
     } else if(item instanceof Dispenser) {
       result = new Image("edu/ssau/gasstation/GUI/controllers/images/dispenser-small.png");
     } else if(item instanceof edu.ssau.gasstation.topology.Refueller) {
-      result = new Image("edu/ssau/gasstation/GUI/controllers/images/car.png");
+      result = new Image("edu/ssau/gasstation/GUI/controllers/images/refueller-small.png");
     } else if (item instanceof Collector){
-      result = new Image("edu/ssau/gasstation/GUI/controllers/images/car.png");
+      result = new Image("edu/ssau/gasstation/GUI/controllers/images/collector-small.png");
     } else {
       result = new Image("edu/ssau/gasstation/GUI/controllers/images/car.png");
     }

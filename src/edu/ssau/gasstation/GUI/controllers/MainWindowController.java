@@ -3,11 +3,14 @@ package edu.ssau.gasstation.GUI.controllers;
 import edu.ssau.gasstation.DB.DBHelper;
 import edu.ssau.gasstation.GUI.components.ImageCell;
 import edu.ssau.gasstation.GUI.model.FuelRecord;
+import edu.ssau.gasstation.GUI.view.Main;
 import edu.ssau.gasstation.XMLHelper.XMLParser;
 import edu.ssau.gasstation.XMLHelper.XMLWriter;
 import edu.ssau.gasstation.car.*;
 import edu.ssau.gasstation.modelling.*;
+import edu.ssau.gasstation.modelling.PoolUtils.CarController;
 import edu.ssau.gasstation.topology.*;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -87,6 +90,7 @@ public class MainWindowController {
 
     @FXML
     private void initialize() {
+        save.setDisable(true);
         try {
             root  = FXMLLoader.load(getClass().getResource("../view/DBWindow.fxml"));
         } catch (IOException e) {
@@ -262,6 +266,7 @@ public class MainWindowController {
                         clearTopology();
                         topology = new Topology(iHeight, iWidth);
                         addConstructorField(iHeight, iWidth);
+                        save.setDisable(false);
                         primaryStage.close();
                     }
                 }
@@ -300,6 +305,7 @@ public class MainWindowController {
                     clearTopology();
                     DBWindowController.showAlert("Некорректная топология", "Невозможно открыть топологию");
                 }
+                save.setDisable(false);
             }
         });
 
@@ -351,7 +357,7 @@ public class MainWindowController {
             try {
                 for (int i = 0; i < topology.getHeight(); i++) {
                     for (int j = 0; j < topology.getWidth(); j++) {
-                        if(topology.getTopologyItem(i, j) instanceof Tank){
+                        if (topology.getTopologyItem(i, j) instanceof Tank) {
                             int id;
                             if ((id = ((Tank) topology.getTopologyItem(i, j)).getFuelID()) != -1) {
                                 tankFuel.add(id);
@@ -361,7 +367,11 @@ public class MainWindowController {
                                 throw new IllegalArgumentException("Необходимо указать тип топлива резервуара");
                             }
                         }
-                        else if (topology.getTopologyItem(i, j) instanceof Dispenser) {
+                    }
+                }
+                for (int i = 0; i < topology.getHeight(); i++) {
+                    for (int j = 0; j < topology.getWidth(); j++) {
+                        if (topology.getTopologyItem(i, j) instanceof Dispenser) {
                             int id;
                             if ((id = ((Dispenser) topology.getTopologyItem(i, j)).getFuelID()) != -1) {
                                 if(tankFuel.contains(id)) {
@@ -578,12 +588,29 @@ public class MainWindowController {
                                         }
                                         CarPool cp = new CarPool(flow);
                                         try {
-                                            ArrayList<edu.ssau.gasstation.car.Car> pool = cp.getCarPool(10);
-                                            System.out.println("POOL");
+                                            XMLWriter.write(topology, "temp.xml");
+                                            ArrayList<edu.ssau.gasstation.car.Car> pool = cp.getCarPool(10, dispenserFuel);
+                                            Stage primaryStage = new Stage();
+                                            Platform.setImplicitExit(false);
+                                            //Topology topology = XMLParser.getTopologyFromFile("temp.xml");
+                                            CarController ctrl = new CarController(topology, pool);
+                                            FXMLLoader loader = new FXMLLoader(Main.class.getResource("modelWindow.fxml"));
+                                            Parent root = loader.load();
+                                            ModelWindowController controller = loader.getController();
+
+                                            primaryStage.setTitle("Model");
+                                            primaryStage.setScene(new Scene(root));
+                                            primaryStage.setMaximized(true);
+                                            primaryStage.show();
+                                            ctrl.setController(controller);
+                                            ctrl.start();
+
                                         } catch (SQLException e) {
                                             e.printStackTrace();
                                         }
-                                        //todo открывать окно моделирования
+                                        catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                         System.out.println("FLOW");
                                     });
                                     Button cancel = new Button("Отмена");

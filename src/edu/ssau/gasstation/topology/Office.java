@@ -5,7 +5,7 @@ package edu.ssau.gasstation.topology;
  */
 public class Office implements TopologyItem {
   private double cashAmount;
-  private double MAX = 70;
+  private double MAX = 7000000;
   private double PRICE = 2;
 
   public Office() {

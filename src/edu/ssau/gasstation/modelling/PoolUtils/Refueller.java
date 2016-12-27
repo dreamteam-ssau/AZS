@@ -1,6 +1,8 @@
 package edu.ssau.gasstation.modelling.PoolUtils;
 
-public class Refueller {
+import edu.ssau.gasstation.topology.TopologyItem;
+
+public class Refueller implements TopologyItem{
   private int x, y;
   private CarStates state = CarStates.MovingToDispenser;
 

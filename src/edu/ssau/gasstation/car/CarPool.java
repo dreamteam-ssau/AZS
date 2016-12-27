@@ -2,6 +2,7 @@ package edu.ssau.gasstation.car;
 
 import edu.ssau.gasstation.DB.DBHelper;
 import edu.ssau.gasstation.GUI.model.CarRecord;
+import edu.ssau.gasstation.GUI.model.FuelRecord;
 import edu.ssau.gasstation.modelling.Flow;
 import javafx.collections.ObservableList;
 
@@ -24,12 +25,12 @@ public class CarPool {
         this.flow = flow;
     }
 
-    public ArrayList<Car> getCarPool(int size) throws SQLException {
-        createPool(size);
+    public ArrayList<Car> getCarPool(int size, ArrayList<Integer> fuel) throws SQLException {
+        createPool(size, fuel);
         return this.cars;
     }
 
-    private void createPool(int size) throws SQLException {
+    private void createPool(int size, ArrayList<Integer> fuel) throws SQLException {
         DBHelper dbh = new DBHelper();
         ObservableList<CarRecord> car = dbh.getCarList();
         List<Double> time = flow.getValuesSequence(size);
@@ -37,7 +38,10 @@ public class CarPool {
         Random rnd = new Random();
         for(int i = 0; i < size; i++){
             currentTime += time.get(i);
-            CarRecord curr = car.get(rnd.nextInt(car.size()));
+            CarRecord curr;
+            do {
+                curr = car.get(rnd.nextInt(car.size()));
+            }while (!fuel.contains(dbh.getFuelID(curr.getFuelType())));
             this.cars.add(new Car(curr.getCarType(), currentTime, dbh.getFuelID(curr.getFuelType()), 1, curr.getTankVolume(), curr.getTankVolume()*0.3));
         }
     }

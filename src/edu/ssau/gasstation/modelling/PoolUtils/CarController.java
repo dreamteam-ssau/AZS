@@ -3,7 +3,9 @@ package edu.ssau.gasstation.modelling.PoolUtils;
 import java.util.*;
 
 import edu.ssau.gasstation.GUI.controllers.ModelWindowController;
+import edu.ssau.gasstation.car.*;
 import edu.ssau.gasstation.topology.*;
+import edu.ssau.gasstation.topology.Car;
 import javafx.application.Platform;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -48,14 +50,20 @@ public class CarController extends Thread {
     this.controller = controller;
   }
 
-  public CarController(Topology topology) {
+  public CarController(Topology topology, ArrayList<edu.ssau.gasstation.car.Car> pool) {
     this.topology = topology;
     items = topology.getTopology();
     completeObjects();
     createTanks();
-    fillCars();
+    setCarPool(pool);
     createPathFromEntry();
     //createPathToExit();
+  }
+
+  public void setCarPool(ArrayList<edu.ssau.gasstation.car.Car> pool){
+    for(int i = 0; i < pool.size(); i++){
+      this.pool.add(new CarOnTopology(pool.get(i), entry.x, entry.y, CarStates.MovingToDispenser));
+    }
   }
 
   private void turnOffice() {
@@ -131,16 +139,17 @@ public class CarController extends Thread {
   }
 
   private void findPathToExitForRefueller(Refueller refueller) {
+    exitDijkstra = new Dijkstra(items, exit.x, exit.y);
     //exitDijkstra.dijkstra(exit.x, exit.y);
     exitDijkstra.dijkstra(refueller.getX(), refueller.getY());
     pathToExitForRefueller.put(refueller, getPathFrom(exit.x, exit.y, refueller.getX(), refueller.getY()));
   }
 
   private void fillCars() {
-    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 1, 229, 1, 20, 0), entry.x, entry.y, CarStates.MovingToDispenser));
-    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 20, 229, 1, 20, 0), entry.x, entry.y, CarStates.MovingToDispenser));
-    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 40, 229, 1, 10, 3), entry.x, entry.y, CarStates.MovingToDispenser));
-    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 70, 229, 1, 40, 0), entry.x, entry.y, CarStates.MovingToDispenser));
+    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 1, 3, 1, 20, 0), entry.x, entry.y, CarStates.MovingToDispenser));
+    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 20, 3, 1, 20, 0), entry.x, entry.y, CarStates.MovingToDispenser));
+    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 40, 3, 1, 10, 3), entry.x, entry.y, CarStates.MovingToDispenser));
+    pool.add(new CarOnTopology(new edu.ssau.gasstation.car.Car("1", 70, 3, 1, 40, 0), entry.x, entry.y, CarStates.MovingToDispenser));
   }
 
   private void createTanks() {

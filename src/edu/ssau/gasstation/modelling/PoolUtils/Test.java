@@ -17,9 +17,9 @@ import edu.ssau.gasstation.topology.Topology;
  * @version $Revision: 1227 $, $Date: 2014-08-08 09:02:22 +0400 (Fri, 08 Aug 2014) $, $Author: versiya-g.nikolaev $
  */
 public class Test {
-  public static void main(String[] args) throws XMLStreamException {
+  /*public static void main(String[] args) throws XMLStreamException {
     Topology topology = XMLParser.getTopologyFromFile("base.xml");
     CarController ctrl = new CarController(topology);
     ctrl.start();
-  }
+  }*/
 }

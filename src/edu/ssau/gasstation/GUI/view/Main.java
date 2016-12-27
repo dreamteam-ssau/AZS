@@ -14,18 +14,18 @@ import javafx.stage.Stage;
 /**
  * Created by andrey on 05.12.16.
  */
-public class Main extends Application {
-  @Override
-  public void start(Stage primaryStage) throws Exception {
-        /*Parent root = FXMLLoader.load(getClass().getResource("view/mainWindow.fxml"));
+public class Main  {
+  /*public static void start() throws Exception {
+        Parent root = FXMLLoader.load(getClass().getResource("view/mainWindow.fxml"));
         primaryStage.setTitle("West Coast AZS");
         primaryStage.setScene(new Scene(root));
         primaryStage.setMaximized(true);
-        primaryStage.show();*/
+        primaryStage.show();
+        Stage primaryStage = new Stage();
     Platform.setImplicitExit(false);
-    Topology topology = XMLParser.getTopologyFromFile("12334.xml");
+    Topology topology = XMLParser.getTopologyFromFile("temp.xml");
     CarController ctrl = new CarController(topology);
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("modelWindow.fxml"));
+    FXMLLoader loader = new FXMLLoader(Main.class.getResource("modelWindow.fxml"));
     Parent root = loader.load();
     ModelWindowController controller = loader.getController();
 
@@ -35,10 +35,10 @@ public class Main extends Application {
     primaryStage.show();
     ctrl.setController(controller);
     ctrl.start();
-  }
+  }*/
 
 
-  public static void main(String[] args) {
+  /*public static void main(String[] args) {
     launch(args);
-  }
+  }*/
 }
